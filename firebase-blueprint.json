@@ -1,0 +1,168 @@
+{
+  "entities": {
+    "products": {
+      "title": "Product",
+      "description": "Item do cardápio como hambúrguer, combo, acompanhamento ou bebida",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 120 },
+        "description": { "type": "string", "maxLength": 500 },
+        "category": { "type": "string", "enum": ["hamburgueres", "combos", "porcoes", "bebidas", "sobremesas"] },
+        "price": { "type": "number" },
+        "cost": { "type": "number" },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "available": { "type": "boolean" },
+        "recipe": { "type": "array" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["name", "category", "price", "available"]
+    },
+    "orders": {
+      "title": "Order",
+      "description": "Pedido de lanche realizado no balcão ou delivery",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "orderNumber": { "type": "number" },
+        "customerName": { "type": "string", "maxLength": 120 },
+        "customerPhone": { "type": "string", "maxLength": 30 },
+        "customerAddress": { "type": "string", "maxLength": 300 },
+        "type": { "type": "string", "enum": ["delivery", "retirada", "mesa"] },
+        "status": { "type": "string", "enum": ["recebido", "em_preparo", "pronto", "saiu_entrega", "entregue", "cancelado"] },
+        "items": { "type": "array" },
+        "subtotal": { "type": "number" },
+        "deliveryFee": { "type": "number" },
+        "discount": { "type": "number" },
+        "total": { "type": "number" },
+        "paymentMethod": { "type": "string", "enum": ["pix", "credito", "debito", "dinheiro"] },
+        "paymentStatus": { "type": "string", "enum": ["pago", "pendente"] },
+        "notes": { "type": "string", "maxLength": 500 },
+        "stockDeducted": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["customerName", "type", "status", "items", "total", "paymentMethod", "paymentStatus"]
+    },
+    "ingredients": {
+      "title": "Ingredient",
+      "description": "Insumo ou ingrediente de estoque utilizado nas fichas técnicas",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 120 },
+        "category": { "type": "string", "maxLength": 60 },
+        "quantity": { "type": "number" },
+        "minQuantity": { "type": "number" },
+        "unit": { "type": "string", "enum": ["kg", "g", "un", "l", "ml", "pct"] },
+        "costPerUnit": { "type": "number" },
+        "supplierId": { "type": "string", "maxLength": 128 },
+        "supplierName": { "type": "string", "maxLength": 120 },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["name", "quantity", "minQuantity", "unit", "costPerUnit"]
+    },
+    "transactions": {
+      "title": "Transaction",
+      "description": "Registro financeiro de entrada (receita) ou saída (despesa/compra)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "description": { "type": "string", "maxLength": 200 },
+        "type": { "type": "string", "enum": ["receita", "despesa"] },
+        "category": { "type": "string", "maxLength": 60 },
+        "amount": { "type": "number" },
+        "date": { "type": "string" },
+        "paymentMethod": { "type": "string", "enum": ["pix", "credito", "debito", "dinheiro", "boleto", "transferencia"] },
+        "orderId": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["pago", "pendente"] },
+        "notes": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["description", "type", "category", "amount", "date", "status"]
+    },
+    "customers": {
+      "title": "Customer",
+      "description": "Dados cadastrais e histórico de clientes do Se Liga Lanche",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "address": { "type": "string", "maxLength": 300 },
+        "neighborhood": { "type": "string", "maxLength": 100 },
+        "notes": { "type": "string", "maxLength": 500 },
+        "totalSpent": { "type": "number" },
+        "orderCount": { "type": "number" },
+        "lastOrderDate": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name", "phone"]
+    },
+    "suppliers": {
+      "title": "Supplier",
+      "description": "Fornecedores parceiros de carnes, pães, bebidas, embalagens e hortifruti",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 120 },
+        "contactName": { "type": "string", "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "email": { "type": "string", "maxLength": 120 },
+        "cnpj": { "type": "string", "maxLength": 30 },
+        "category": { "type": "string", "maxLength": 60 },
+        "deliveryLeadDays": { "type": "number" },
+        "notes": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["name", "phone"]
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Configurações gerais da hamburgueria Se Liga Lanche",
+      "type": "object",
+      "properties": {
+        "businessName": { "type": "string", "maxLength": 120 },
+        "fantasyName": { "type": "string", "maxLength": 120 },
+        "cnpj": { "type": "string", "maxLength": 30 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "whatsapp": { "type": "string", "maxLength": 30 },
+        "address": { "type": "string", "maxLength": 200 },
+        "deliveryFee": { "type": "number" },
+        "avgPrepTimeMinutes": { "type": "number" },
+        "isOpen": { "type": "boolean" },
+        "openingHours": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["businessName", "phone"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/products" },
+      "description": "Itens do cardápio comercializados pela hamburgueria"
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/orders" },
+      "description": "Pedidos realizados pelos clientes no balcão e delivery"
+    },
+    "/ingredients/{ingredientId}": {
+      "schema": { "$ref": "#/entities/ingredients" },
+      "description": "Insumos de estoque com controle de nível mínimo e custo"
+    },
+    "/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/transactions" },
+      "description": "Movimentações financeiras de receitas e despesas"
+    },
+    "/customers/{customerId}": {
+      "schema": { "$ref": "#/entities/customers" },
+      "description": "Clientes cadastrados com histórico de compras"
+    },
+    "/suppliers/{supplierId}": {
+      "schema": { "$ref": "#/entities/suppliers" },
+      "description": "Fornecedores de matéria-prima e embalagens"
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/settings" },
+      "description": "Parâmetros operacionais e comerciais da empresa"
+    }
+  }
+}

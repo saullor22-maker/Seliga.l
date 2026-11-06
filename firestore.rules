@@ -1,0 +1,88 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Admins and Staff helper (bootstrapped to user email or authenticated manager)
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'saullor22@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Products collection: public or authenticated can read, admins/staff can manage
+    match /products/{productId} {
+      allow read: if isValidId(productId);
+      allow create: if isSignedIn() && isValidId(productId) && incoming().name is string && incoming().name.size() <= 120;
+      allow update: if isSignedIn() && isValidId(productId) && incoming().name is string && incoming().name.size() <= 120;
+      allow delete: if isAdmin() && isValidId(productId);
+    }
+
+    // Orders collection
+    match /orders/{orderId} {
+      allow read: if isSignedIn() && isValidId(orderId);
+      allow create: if isSignedIn() && isValidId(orderId) && incoming().customerName is string && incoming().customerName.size() <= 120;
+      allow update: if isSignedIn() && isValidId(orderId) && incoming().customerName is string && incoming().customerName.size() <= 120;
+      allow delete: if isAdmin() && isValidId(orderId);
+    }
+
+    // Ingredients collection
+    match /ingredients/{ingredientId} {
+      allow read: if isSignedIn() && isValidId(ingredientId);
+      allow create: if isSignedIn() && isValidId(ingredientId) && incoming().name is string && incoming().name.size() <= 120;
+      allow update: if isSignedIn() && isValidId(ingredientId) && incoming().name is string && incoming().name.size() <= 120;
+      allow delete: if isAdmin() && isValidId(ingredientId);
+    }
+
+    // Transactions collection
+    match /transactions/{transactionId} {
+      allow read: if isSignedIn() && isValidId(transactionId);
+      allow create: if isSignedIn() && isValidId(transactionId) && incoming().amount is number;
+      allow update: if isSignedIn() && isValidId(transactionId) && incoming().amount is number;
+      allow delete: if isAdmin() && isValidId(transactionId);
+    }
+
+    // Customers collection (PII Protected)
+    match /customers/{customerId} {
+      allow read: if isSignedIn() && isValidId(customerId);
+      allow create: if isSignedIn() && isValidId(customerId) && incoming().name is string && incoming().name.size() <= 120;
+      allow update: if isSignedIn() && isValidId(customerId) && incoming().name is string && incoming().name.size() <= 120;
+      allow delete: if isAdmin() && isValidId(customerId);
+    }
+
+    // Suppliers collection
+    match /suppliers/{supplierId} {
+      allow read: if isSignedIn() && isValidId(supplierId);
+      allow create: if isSignedIn() && isValidId(supplierId) && incoming().name is string && incoming().name.size() <= 120;
+      allow update: if isSignedIn() && isValidId(supplierId) && incoming().name is string && incoming().name.size() <= 120;
+      allow delete: if isAdmin() && isValidId(supplierId);
+    }
+
+    // Settings collection
+    match /settings/{settingId} {
+      allow read: if isValidId(settingId);
+      allow write: if isSignedIn() && isValidId(settingId);
+    }
+  }
+}
